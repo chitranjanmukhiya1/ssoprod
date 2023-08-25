@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken")
 const getEmailMsgTemplate = require("../utils/getEmailMsgTemplate")
 const getButtonTemplate = require("../utils/getButtonTemplate")
 const sendMail = require("../utils/sendMail")
+const validator = require("validator")
 
 const signup2 = async (req, res) => {
   const {
@@ -33,7 +34,15 @@ const signup2 = async (req, res) => {
   const [localPart, domainPart] = email.split("@")
   const lowercaseLocalPart = localPart.toLowerCase()
   const lowercaseEmail = `${lowercaseLocalPart}@${domainPart}`
-
+  const isName = validator.isAlpha(name)
+  console.log(isName)
+  if (isName === false) {
+    throw new BadRequestError("please provide correct name")
+  }
+  const isEmail = validator.isEmail(email)
+  if (isEmail === false) {
+    throw new BadRequestError("please provide correct email")
+  }
   // check if user already exists
   const userAlreadyExist = await UserModel.findOne({ email: lowercaseEmail })
 
