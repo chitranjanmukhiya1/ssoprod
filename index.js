@@ -24,7 +24,6 @@ const limiter = rateLimit({
   // store: ... , // Use an external store for more precise rate limiting
 })
 
-// Apply the rate limiting middleware to all requests
 app.use(limiter)
 const url = process.env.URL
 
