@@ -28,26 +28,57 @@ const signup2 = async (req, res) => {
   } = req.body
 
   if (!name || !email) {
-    throw new BadRequestError("please provide all values")
+    // throw new BadRequestError("please provide all values")
+    return res.status(400).json({
+      status: false,
+      message: "please provide all values",
+    })
   }
 
   const [localPart, domainPart] = email.split("@")
   const lowercaseLocalPart = localPart.toLowerCase()
   const lowercaseEmail = `${lowercaseLocalPart}@${domainPart}`
-  const isName = validator.isAlpha(name)
+  // const isName = validator.isAlpha(name)
+  function isFullNameAlpha(fullName) {
+    // Split the full name into individual words
+    const words = fullName.trim().split(/\s+/)
+
+    // Check if each word is alpha
+    for (const word of words) {
+      if (!validator.isAlpha(word)) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  const isName = isFullNameAlpha(name)
   console.log(isName)
   if (isName === false) {
-    throw new BadRequestError("please provide correct name")
+    // throw new BadRequestError("please provide correct name")
+    return res.status(400).json({
+      status: false,
+      message: "please provide correct name",
+    })
   }
   const isEmail = validator.isEmail(email)
   if (isEmail === false) {
-    throw new BadRequestError("please provide correct email")
+    // throw new BadRequestError("please provide correct email")
+    return res.status(400).json({
+      status: false,
+      message: "please provide correct email",
+    })
   }
   // check if user already exists
   const userAlreadyExist = await UserModel.findOne({ email: lowercaseEmail })
 
   if (userAlreadyExist) {
-    throw new BadRequestError("user already exist")
+    // throw new BadRequestError("user already exist")
+    return res.status(400).json({
+      status: false,
+      message: "user already exist",
+    })
   }
 
   const token = jwt.sign(

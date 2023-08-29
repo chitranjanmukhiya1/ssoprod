@@ -11,7 +11,11 @@ const getEmailMsgTemplate = require("../utils/getEmailMsgTemplate")
 const send_otp = async (req, res) => {
   const email = req.body.email
   if (!email) {
-    throw new BadRequestError("please provide email")
+    // throw new BadRequestError("please provide email")
+    return res.status(400).json({
+      status: false,
+      message: "please provide email",
+    })
   }
   const [localPart, domainPart] = email.split("@")
   const lowercaseLocalPart = localPart.toLowerCase()
@@ -19,7 +23,11 @@ const send_otp = async (req, res) => {
 
   const user = await UserModel.findOne({ email: lowercaseEmail })
   if (!user) {
-    throw new NotFoundError("user does not exist")
+    // throw new NotFoundError("user does not exist")
+    return res.status(404).json({
+      status: false,
+      message: "user does not exist",
+    })
   }
   const otp = Math.floor(100000 + Math.random() * 900000)
 
@@ -51,7 +59,11 @@ const verify_otp = async (req, res) => {
   const { otp, email } = req.body
 
   if (!otp || !email) {
-    throw new BadRequestError("OTP and email not provided")
+    // throw new BadRequestError("OTP and email not provided")
+    return res.status(400).json({
+      status: false,
+      message: "OTP and email not provided",
+    })
   }
 
   // Check if OTP is alphabetic
@@ -75,7 +87,8 @@ const verify_otp = async (req, res) => {
     })
   }
 
-  const user = await UserModel.findOne({ email })
+  // const user = await UserModel.findOne({ email })
+  const user = await UserModel.findOne({ email: lowercaseEmail })
 
   if (!user) {
     return res.status(200).json({
@@ -105,7 +118,8 @@ const verify_otp = async (req, res) => {
   // );
   // delete the otp after use
 
-  await OtpModel.findOneAndDelete({ email: email, otp: otp })
+  // await OtpModel.findOneAndDelete({ email: email, otp: otp })
+  await OtpModel.findOneAndDelete({ email: lowercaseEmail, otp: otp })
 
   const { accessToken, refreshToken } = await generateTokens(user)
 
@@ -122,7 +136,11 @@ const verify_email = async (req, res) => {
   let data = await UserModel.findOne({ email_token: email_token })
 
   if (!data) {
-    throw new BadRequestError("Email does not exist")
+    // throw new BadRequestError("Email does not exist")
+    return res.status(400).json({
+      status: false,
+      message: "Email does not exist",
+    })
   }
   // else update the isactive to true and also send tokens in response
 
