@@ -30,7 +30,7 @@ const signup2 = async (req, res) => {
   if (!name || !email) {
     // throw new BadRequestError("please provide all values")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "please provide all values",
     })
   }
@@ -58,15 +58,15 @@ const signup2 = async (req, res) => {
   if (isName === false) {
     // throw new BadRequestError("please provide correct name")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "please provide correct name",
     })
   }
   const isEmail = validator.isEmail(email)
-  if (isEmail === false) {
+  if (isEmail === false) {  
     // throw new BadRequestError("please provide correct email")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "please provide correct email",
     })
   }
@@ -76,7 +76,7 @@ const signup2 = async (req, res) => {
   if (userAlreadyExist) {
     // throw new BadRequestError("user already exist")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "user already exist",
     })
   }
@@ -120,9 +120,9 @@ const signup2 = async (req, res) => {
     `,
     name
   )
-  sendMail(lowercaseEmail, subject, html)
+  //sendMail(lowercaseEmail, subject, html)
 
-  res.status(201).json({ status: true, message: "signup successful", user })
+  res.status(201).json({ status: 200, message: "signup successful", user })
 }
 const deleteUser = async (req, res) => {
   const { email } = req.body
@@ -141,6 +141,6 @@ const deleteUser = async (req, res) => {
     throw new NotFoundError("no user with this id")
   }
   const deletedUser = await UserModel.findByIdAndDelete(user._id)
-  res.status(200).json({ status: true, msg: "user deleted successfully" })
+  res.status(200).json({ status: 200, msg: "user deleted successfully" })
 }
 module.exports = { signup2, deleteUser }

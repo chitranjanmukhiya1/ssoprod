@@ -15,7 +15,7 @@ const getNewAccessToken = async (req, res) => {
     )
     res.status(200).json({
       accessToken,
-      msg: "access token created successfully",
+      message: "access token created successfully",
     })
   } else {
     res.status(401).json({ message: "refresh token invalid" })

@@ -13,7 +13,7 @@ const send_otp = async (req, res) => {
   if (!email) {
     // throw new BadRequestError("please provide email")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "please provide email",
     })
   }
@@ -25,7 +25,7 @@ const send_otp = async (req, res) => {
   if (!user) {
     // throw new NotFoundError("user does not exist")
     return res.status(404).json({
-      status: false,
+      status: 500,
       message: "user does not exist",
     })
   }
@@ -51,7 +51,7 @@ const send_otp = async (req, res) => {
 
     sendMail(lowercaseEmail, subject, html)
 
-    return res.status(200).json({ status: true, message: "Otp sended to mail" })
+    return res.status(200).json({ status: 200, message: "Otp sended to mail" })
   }
 }
 
@@ -61,7 +61,7 @@ const verify_otp = async (req, res) => {
   if (!otp || !email) {
     // throw new BadRequestError("OTP and email not provided")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "OTP and email not provided",
     })
   }
@@ -69,7 +69,7 @@ const verify_otp = async (req, res) => {
   // Check if OTP is alphabetic
   if (isNaN(otp)) {
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "OTP is incorrect",
     })
   }
@@ -82,7 +82,7 @@ const verify_otp = async (req, res) => {
 
   if (!data) {
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "OTP is incorrect",
     })
   }
@@ -92,14 +92,14 @@ const verify_otp = async (req, res) => {
 
   if (!user) {
     return res.status(200).json({
-      status: false,
+      status: 500,
       message: "User does not exist",
     })
   }
 
   if (!user.is_active) {
     return res.status(403).json({
-      status: false,
+      status: 500,
       message: "Please contact the administrator for assistance",
     })
   }
@@ -118,13 +118,24 @@ const verify_otp = async (req, res) => {
   // );
   // delete the otp after use
 
+  // if time is expired then
+  const now = new Date(); // Current time
+  const createdOnTime = new Date(data.created_on); // Convert the data.created_on timestamp to a Date object
+  const tenMinuteInMillis = 1 * 60 * 1000; // 10 minutes in milliseconds
+  if (now - createdOnTime > tenMinuteInMillis) {
+    return res.status(403).json({
+      status: 500,
+      message: "OTP has expired",
+    });
+  }
+
   // await OtpModel.findOneAndDelete({ email: email, otp: otp })
   await OtpModel.findOneAndDelete({ email: lowercaseEmail, otp: otp })
 
   const { accessToken, refreshToken } = await generateTokens(user)
 
   return res.status(200).json({
-    status: true,
+    status: 200,
     user: user,
     accessToken,
     refreshToken,
@@ -138,7 +149,7 @@ const verify_email = async (req, res) => {
   if (!data) {
     // throw new BadRequestError("Email does not exist")
     return res.status(400).json({
-      status: false,
+      status: 500,
       message: "Email does not exist",
     })
   }
@@ -146,7 +157,7 @@ const verify_email = async (req, res) => {
 
   if (!data.is_active) {
     return res.status(403).json({
-      status: false,
+      status: 500,
       message:
         "User is not active. Please contact the administrator for assistance.",
     })
@@ -160,7 +171,7 @@ const verify_email = async (req, res) => {
   const { accessToken, refreshToken } = await generateTokens(data)
 
   res.status(200).json({
-    status: true,
+    status: 200,
     message: "Email verified",
     user: data,
     accessToken,
